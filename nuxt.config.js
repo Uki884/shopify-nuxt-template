@@ -57,5 +57,12 @@ module.exports = {
      ** You can extend webpack config here
      */
     extend(config, ctx) {}
+  },
+  /*
+   ** Server configuration
+   */
+  server: {
+    port: 8081,
+    host: '0.0.0.0'
   }
 }

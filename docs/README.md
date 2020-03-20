@@ -4,6 +4,8 @@
 
 ### Prerequisites
 
+- [Node.js](https://nodejs.org/)
+  - v10 以降で動作。v12 推奨。
 - [Yarn](https://classic.yarnpkg.com/)
   - 1.x 系でのみ動作確認済み。
 - [Shopify App CLI](https://github.com/Shopify/shopify-app-cli)
@@ -101,7 +103,57 @@ Updating shopify-cli...done!
 
 !> 何らかの問題が発生した場合は[こちら](?id=shopify-app-cli)。
 
+### Documentation
+
+このドキュメントは [docsify](https://docsify.js.org/) で記述されている。
+以下のコマンドでサーバが起動し、 http://localhost:3000 でドキュメントを閲覧することが可能。
+
+```bash
+$ npx docsify serve docs
+```
+
 ## Memo
+
+### 実装
+
+プロジェクトは `yarn create nuxt-app` で生成。
+
+#### 依存パッケージ
+
+- `@shopify/koa-shopify-auth`
+  - Shopify の OAuth 実装のパッケージ。
+  - `shopifyAuth` 関数で、OAuth のための middleware が生成される。
+  - `verifyRequest` 関数で、セッションに格納されているアクセストークンの有効性確認を行う middleware が生成される。有効でなかった場合には再認証する。
+- `koa-session`
+  - Koa でセッションを扱うためのパッケージ。
+  - Cookie に暗号化したセッションデータを書いている。暗号鍵は `app.keys = ...` で設定。
+- `@koa/router`
+  - ルーティングを Express に近い書き方で行うためのパッケージ。
+- `isomorphic-fetch`
+  - Fetch API を利用するためのパッケージ。
+
+#### 処理の流れ
+
+最初に実行されるのは server/index.js 。処理の大まかな流れは以下の通り。
+
+1. Koa インスタンスの生成。
+2. nuxt.config.js の読み込み。
+3. OAuth 関連処理を Koa に登録（setupShopifyAuth 関数）。
+4. Nuxt 外で処理させたいものを Koa に登録（setupRoutes 関数）。
+5. Nuxt を Koa に登録。
+6. サーバ起動。
+
+#### Shopify Admin API の呼び出し方
+
+https://shopify.dev/docs/admin-api
+
+※ 本リポジトリでは REST API を利用。
+
+API コール時には、`X-Shopify-Access-Token` ヘッダにアクセストークンをつけてリクエストを送る。それ以外のパラメータについては各 API のドキュメントに従う。
+
+各 API は、事前に認可を受けたものしか利用できない。
+[Admin API access scopes](https://shopify.dev/docs/admin-api/access-scopes)に従い、必要なスコープを .env ファイル内の SCOPES に記述する。
+記述を変更した場合には再度認可のフローをやり直す必要がある。
 
 ### Shopify App CLI
 

@@ -1,3 +1,6 @@
+require('dotenv').config()
+require('isomorphic-fetch')
+
 module.exports = {
   mode: 'universal',
   /*
@@ -23,7 +26,11 @@ module.exports = {
   /*
    ** Global CSS
    */
-  css: [],
+  css: [
+    '~/assets/css/normalize.css',
+    '~/assets/css/skeleton.css',
+    '~/assets/css/base.css'
+  ],
   /*
    ** Plugins to load before mounting the App
    */

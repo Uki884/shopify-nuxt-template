@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils'
-import Logo from '@/components/Logo.vue'
+import AppHeader from '@/components/AppHeader.vue'
 
-describe('Logo', () => {
+describe('AppHeader', () => {
   test('is a Vue instance', () => {
-    const wrapper = mount(Logo)
+    const wrapper = mount(AppHeader)
     expect(wrapper.isVueInstance()).toBeTruthy()
   })
 })

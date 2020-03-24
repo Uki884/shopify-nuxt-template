@@ -14,6 +14,7 @@
     "docs": "docsify serve docs"
   },
   "dependencies": {
+    "@koa/cors": "2",
     "@koa/router": "^8.0.8",
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/dotenv": "^1.4.0",
@@ -21,6 +22,7 @@
     "cross-env": "^5.2.0",
     "isomorphic-fetch": "^2.2.1",
     "koa": "^2.6.2",
+    "koa-bodyparser": "^4.2.1",
     "koa-session": "^5.13.1",
     "nuxt": "^2.0.0"
   },

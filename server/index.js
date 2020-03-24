@@ -1,71 +1,34 @@
 const Koa = require('koa')
+const bodyParser = require('koa-bodyparser')
 const session = require('koa-session')
-const Router = require('@koa/router')
-const { default: shopifyAuth } = require('@shopify/koa-shopify-auth')
+const cors = require('@koa/cors')
 const { verifyRequest } = require('@shopify/koa-shopify-auth')
 const consola = require('consola')
-const { Nuxt, Builder } = require('nuxt')
+
+const prepareNuxt = require('./libs/prepare-nuxt')
+const router = require('./middlewares/routes')
+const fillShopQuery = require('./middlewares/fill-shop-query')
+const shopifyAuth = require('./middlewares/shopify-auth')
 
 const app = new Koa()
-const router = new Router()
 
-// Import and Set Nuxt.js options
-const config = require('../nuxt.config.js')
-config.dev = app.env !== 'production'
+async function start() {
+  const dev = app.env !== 'production'
+  const nuxt = await prepareNuxt(dev)
 
-function setupShopifyAuth() {
-  const { SHOP, SHOPIFY_API_KEY, SHOPIFY_API_SECRET, SCOPES } = process.env
+  const { SHOPIFY_API_SECRET } = process.env
   app.keys = [SHOPIFY_API_SECRET]
 
   app.use(session({ secure: true, sameSite: 'none' }, app))
-  app.use(async (ctx, next) => {
-    if (!ctx.request.query.shop) {
-      ctx.request.query.shop = SHOP
-    }
-    await next()
-  })
-  app.use(
-    shopifyAuth({
-      apiKey: SHOPIFY_API_KEY,
-      secret: SHOPIFY_API_SECRET,
-      scopes: [SCOPES],
-      afterAuth(ctx) {
-        ctx.redirect('/')
-      }
-    })
-  )
-  app.use(verifyRequest())
-}
+  app.use(cors())
+  app.use(bodyParser())
 
-function setupRoutes() {
-  const handlers = require('./handlers')
+  // Shopify-related middlewares
+  app.use(fillShopQuery())
+  app.use(shopifyAuth())
 
-  router.get('/api/shop', handlers.shopApi)
-  router.get('/api/orders', handlers.ordersApi)
-  router.post('/api/orders/:orderId/cancel', handlers.orderCancelApi)
-  router.get('/api/customers', handlers.customersApi)
-}
-
-async function start() {
-  // Instantiate nuxt.js
-  const nuxt = new Nuxt(config)
-
-  const {
-    host = process.env.HOST || '127.0.0.1',
-    port = process.env.PORT || 3000
-  } = nuxt.options.server
-
-  await nuxt.ready()
-  // Build in development
-  if (config.dev) {
-    const builder = new Builder(nuxt)
-    await builder.build()
-  }
-
-  setupShopifyAuth()
-  setupRoutes()
-
-  router.all('*', (ctx) => {
+  // Route to Nuxt.js
+  router.all('*', verifyRequest(), (ctx) => {
     ctx.status = 200
     ctx.respond = false // Bypass Koa's built-in response handling
     ctx.req.ctx = ctx // This might be useful later on, e.g. in nuxtServerInit or with nuxt-stash
@@ -73,7 +36,12 @@ async function start() {
   })
 
   app.use(router.routes())
-  app.use(router.allowedMethods)
+  app.use(router.allowedMethods())
+
+  const {
+    host = process.env.HOST || '127.0.0.1',
+    port = process.env.PORT || 3000
+  } = nuxt.options.server
 
   app.listen(port, host)
   consola.ready({

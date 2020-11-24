@@ -1,0 +1,78 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: web
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/nginx/conf.d/default.conf.template:/etc/nginx/conf.d/default.conf.template"
+      - "./docker/nginx/nginx.conf:/etc/nginx/nginx.conf"
+    command: >
+      /bin/sh -c
+      "envsubst '
+      $$APP_DOMAIN
+      $$APP_SERVICE_NAME
+      '< /etc/nginx/conf.d/default.conf.template
+      > /etc/nginx/conf.d/default.conf
+      && nginx -g 'daemon off;'"
+    environment:
+        APP_SERVICE_NAME: app
+        APP_DOMAIN: ${APP_DOMAIN}
+    depends_on:
+      - app
+      - db
+    restart: always
+  db:
+    image: postgres:12.4-alpine
+    container_name: db
+    tty: true
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: shopify_db
+      POSTGRES_INITDB_ARGS: --data-checksums
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+  https-portal:
+    image: steveltn/https-portal:1
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: always
+    environment:
+      DOMAINS: '${APP_DOMAIN} -> http://web:8000'
+      STAGE: ${APP_STAGE}
+      CLIENT_MAX_BODY_SIZE: 100M
+      # FORCE_RENEW: 'true'
+  app:
+    container_name: app
+    build: .
+    environment:
+      SHOP: ${SHOP}
+      SHOPIFY_API_KEY: ${SHOPIFY_API_KEY}
+      SHOPIFY_API_SECRET: ${SHOPIFY_API_SECRET}
+      SCOPES: ${SCOPES}
+      HOST: ${HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+    ports:
+      - "8081:8081"
+    command: npm run dev
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    restart: always
+
+volumes:
+  pgdata:
+  node_modules:
+    driver: local

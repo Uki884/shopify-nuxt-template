@@ -19,7 +19,6 @@
 
 <script>
 export default {
-  layout: 'shopify',
   data() {
     return {
       orders: []

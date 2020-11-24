@@ -16,10 +16,8 @@
     </tbody>
   </table>
 </template>
-
 <script>
 export default {
-  layout: 'shopify',
   data() {
     return {
       customers: []
@@ -34,7 +32,6 @@ export default {
         `${process.env.HOST}/api/customers`
       )
       this.customers = response.customers
-      console.log(this.customers)
     }
   }
 }

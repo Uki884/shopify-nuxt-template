@@ -9,7 +9,7 @@ server {
     proxy_redirect                      off;
 
     location / {
-        proxy_set_header Host ${APP_SERVICE_NAME};
+        proxy_set_header Host localhost;
         proxy_pass http://${APP_SERVICE_NAME}:8081;
     }
 

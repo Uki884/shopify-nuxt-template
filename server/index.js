@@ -6,7 +6,7 @@ const { verifyRequest } = require('@shopify/koa-shopify-auth')
 const consola = require('consola')
 
 const prepareNuxt = require('./libs/prepare-nuxt')
-const router = require('./middlewares/routes')
+const router = require('./routes/routes')
 const fillShopQuery = require('./middlewares/fill-shop-query')
 const shopifyAuth = require('./middlewares/shopify-auth')
 

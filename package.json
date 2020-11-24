@@ -24,7 +24,11 @@
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
     "koa-session": "^5.13.1",
-    "nuxt": "^2.0.0"
+    "nuxt": "^2.0.0",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.3.5",
+    "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^2.0.0",

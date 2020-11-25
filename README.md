@@ -1,7 +1,6 @@
-shopify appsをローカル環境で開発できるようにする
+shopify appsをdockerを使ってローカル環境で開発できるようにする
 
 # Setup
-
 
 ## 環境変数設定
 
@@ -30,3 +29,11 @@ docker-compose up -d
 ```
 chrome://flags/#allow-insecure-localhost
 ```
+
+## dbモデル作成
+```
+docker-compose exec app npm run sequelize model:create --name ${テーブル名} --underscored --attributes ${カラム名}:${型}
+
+例: docker-compose exec app npm run sequelize model:create --name movie --underscored --attributes title:string,video_id:string,tag:integer,upload_date:date,is_delete:boolean
+```
+

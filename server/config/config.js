@@ -16,7 +16,7 @@ module.exports = {
   },
   test: {
     username: username,
-    password: null,
+    password: password,
     database: database,
     host: "127.0.0.1",
     port: port,
@@ -24,7 +24,7 @@ module.exports = {
   },
   production: {
     username: username,
-    password: null,
+    password: password,
     database: database,
     host: host,
     port: port,

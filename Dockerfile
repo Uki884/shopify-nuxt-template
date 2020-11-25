@@ -8,5 +8,5 @@ RUN npm install --quiet
 COPY . .
 
 VOLUME /app
-EXPOSE 3000
+EXPOSE 8081
 CMD ["npm", "run", "dev"]

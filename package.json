@@ -1,5 +1,5 @@
 {
-  "name": "shopify-nuxt-koa",
+  "name": "shopify-nuxt-docker-template",
   "version": "1.0.0",
   "description": "Shopify app on Nuxt.js and Koa.js",
   "author": "Akito Tabira",
